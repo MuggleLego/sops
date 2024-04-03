@@ -102,26 +102,7 @@ func div(a, b uint8) uint8 {
 		panic("divide by zero")
 	}
 
-	var goodVal, zero uint8
-	logA := logTable[a]
-	logB := logTable[b]
-	diff := (int(logA) - int(logB)) % 255
-	if diff < 0 {
-		diff += 255
-	}
-
-	ret := expTable[diff]
-
-	// Ensure we return zero if a is zero but aren't subject to timing attacks
-	goodVal = ret
-
-	if subtle.ConstantTimeByteEq(a, 0) == 1 {
-		ret = zero
-	} else {
-		ret = goodVal
-	}
-
-	return ret
+	return mult(a, invTable[b])
 }
 
 // mult multiplies two numbers in GF(2^8)
