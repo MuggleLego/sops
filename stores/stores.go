@@ -42,7 +42,7 @@ type SopsFile struct {
 // in order to allow the binary format to stay backwards compatible over time, but at the same time allow the internal
 // representation SOPS uses to change over time.
 type Metadata struct {
-	ShamirThreshold           int         `yaml:"shamir_threshold,omitempty" json:"shamir_threshold,omitempty"`
+	BlakleyThreshold          int         `yaml:"blakley_threshold,omitempty" json:"blakley_threshold,omitempty"`
 	KeyGroups                 []keygroup  `yaml:"key_groups,omitempty" json:"key_groups,omitempty"`
 	KMSKeys                   []kmskey    `yaml:"kms" json:"kms"`
 	GCPKMSKeys                []gcpkmskey `yaml:"gcp_kms" json:"gcp_kms"`
@@ -122,7 +122,7 @@ func MetadataFromInternal(sopsMetadata sops.Metadata) Metadata {
 	m.MessageAuthenticationCode = sopsMetadata.MessageAuthenticationCode
 	m.MACOnlyEncrypted = sopsMetadata.MACOnlyEncrypted
 	m.Version = sopsMetadata.Version
-	m.ShamirThreshold = sopsMetadata.ShamirThreshold
+	m.BlakleyThreshold = sopsMetadata.BlakleyThreshold
 	if len(sopsMetadata.KeyGroups) == 1 {
 		group := sopsMetadata.KeyGroups[0]
 		m.PGPKeys = pgpKeysFromGroup(group)
@@ -270,7 +270,7 @@ func (m *Metadata) ToInternal() (sops.Metadata, error) {
 	}
 	return sops.Metadata{
 		KeyGroups:                 groups,
-		ShamirThreshold:           m.ShamirThreshold,
+		BlakleyThreshold:          m.BlakleyThreshold,
 		Version:                   m.Version,
 		MessageAuthenticationCode: m.MessageAuthenticationCode,
 		UnencryptedSuffix:         m.UnencryptedSuffix,

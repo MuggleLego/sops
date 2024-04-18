@@ -143,7 +143,7 @@ type creationRule struct {
 	AzureKeyVault     string     `yaml:"azure_keyvault"`
 	VaultURI          string     `yaml:"hc_vault_transit_uri"`
 	KeyGroups         []keyGroup `yaml:"key_groups"`
-	ShamirThreshold   int        `yaml:"shamir_threshold"`
+	BlakleyThreshold  int        `yaml:"blakley_threshold"`
 	UnencryptedSuffix string     `yaml:"unencrypted_suffix"`
 	EncryptedSuffix   string     `yaml:"encrypted_suffix"`
 	UnencryptedRegex  string     `yaml:"unencrypted_regex"`
@@ -170,7 +170,7 @@ func (f *configFile) load(bytes []byte) error {
 // Config is the configuration for a given SOPS file
 type Config struct {
 	KeyGroups         []sops.KeyGroup
-	ShamirThreshold   int
+	BlakleyThreshold  int
 	UnencryptedSuffix string
 	EncryptedSuffix   string
 	UnencryptedRegex  string
@@ -295,7 +295,7 @@ func configFromRule(rule *creationRule, kmsEncryptionContext map[string]*string)
 
 	return &Config{
 		KeyGroups:         groups,
-		ShamirThreshold:   rule.ShamirThreshold,
+		BlakleyThreshold:  rule.BlakleyThreshold,
 		UnencryptedSuffix: rule.UnencryptedSuffix,
 		EncryptedSuffix:   rule.EncryptedSuffix,
 		UnencryptedRegex:  rule.UnencryptedRegex,

@@ -47,16 +47,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
-
+	"github.com/MuggleLego/secret-sharing/blakley"
 	"github.com/getsops/sops/v3/age"
 	"github.com/getsops/sops/v3/audit"
 	"github.com/getsops/sops/v3/keys"
 	"github.com/getsops/sops/v3/keyservice"
 	"github.com/getsops/sops/v3/logging"
 	"github.com/getsops/sops/v3/pgp"
-	"github.com/getsops/sops/v3/shamir"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/net/context"
 )
 
 // DefaultUnencryptedSuffix is the default suffix a TreeItem key has to end with for sops to leave its Value unencrypted
@@ -512,7 +511,6 @@ func (tree *Tree) GenerateDataKeyWithKeyServices(svcs []keyservice.KeyServiceCli
 	return newKey, tree.Metadata.UpdateMasterKeysWithKeyServices(newKey, svcs)
 }
 
-// Metadata holds information about a file encrypted by sops
 type Metadata struct {
 	LastModified              time.Time
 	UnencryptedSuffix         string
@@ -523,9 +521,9 @@ type Metadata struct {
 	MACOnlyEncrypted          bool
 	Version                   string
 	KeyGroups                 []KeyGroup
-	// ShamirThreshold is the number of key groups required to recover the
+	// BlakleyThreshold is the number of key groups required to recover the
 	// original data key
-	ShamirThreshold int
+	BlakleyThreshold int
 	// DataKey caches the decrypted data key so it doesn't have to be decrypted with a master key every time it's needed
 	DataKey []byte
 }
@@ -601,30 +599,29 @@ func (m *Metadata) UpdateMasterKeysWithKeyServices(dataKey []byte, svcs []keyser
 	}
 	var parts [][]byte
 	if len(m.KeyGroups) == 1 {
-		// If there's only one key group, we can't do Shamir. All keys
+		// If there's only one key group, we can't do Blakley. All keys
 		// in the group encrypt the whole data key.
 		parts = append(parts, dataKey)
 	} else {
-		var err error
-		if m.ShamirThreshold == 0 {
-			m.ShamirThreshold = len(m.KeyGroups)
+		if m.BlakleyThreshold == 0 {
+			m.BlakleyThreshold = len(m.KeyGroups)
 		}
 		log.WithFields(logrus.Fields{
-			"quorum": m.ShamirThreshold,
+			"quorum": m.BlakleyThreshold,
 			"parts":  len(m.KeyGroups),
-		}).Info("Splitting data key with Shamir Secret Sharing")
-		parts, err = shamir.Split(dataKey, len(m.KeyGroups), int(m.ShamirThreshold))
+		}).Info("Splitting data key with Blakley Secret Sharing")
+		parts, err := blakley.Split(dataKey, len(m.KeyGroups), int(m.BlakleyThreshold))
 		if err != nil {
-			errs = append(errs, fmt.Errorf("could not split data key into parts for Shamir: %s", err))
+			errs = append(errs, fmt.Errorf("could not split data key into parts for Blakley: %s", err))
 			return
 		}
 		if len(parts) != len(m.KeyGroups) {
-			errs = append(errs, fmt.Errorf("not enough parts obtained from Shamir: need %d, got %d", len(m.KeyGroups), len(parts)))
+			errs = append(errs, fmt.Errorf("not enough parts obtained from Blakley: need %d, got %d", len(m.KeyGroups), len(parts)))
 			return
 		}
 	}
 	for i, group := range m.KeyGroups {
-		part := parts[i]
+		pa := parts[i]
 		for _, key := range group {
 			svcKey := keyservice.KeyFromMasterKey(key)
 			var keyErrs []error
@@ -632,7 +629,7 @@ func (m *Metadata) UpdateMasterKeysWithKeyServices(dataKey []byte, svcs []keyser
 			for _, svc := range svcs {
 				rsp, err := svc.Encrypt(context.Background(), &keyservice.EncryptRequest{
 					Key:       &svcKey,
-					Plaintext: part,
+					Plaintext: pa,
 				})
 				if err != nil {
 					keyErrs = append(keyErrs, fmt.Errorf("failed to encrypt new data key with master key %q: %w", key.ToString(), err))
@@ -666,7 +663,7 @@ func (m Metadata) GetDataKeyWithKeyServices(svcs []keyservice.KeyServiceClient, 
 		return m.DataKey, nil
 	}
 	getDataKeyErr := getDataKeyError{
-		RequiredSuccessfulKeyGroups: m.ShamirThreshold,
+		RequiredSuccessfulKeyGroups: m.BlakleyThreshold,
 		GroupResults:                make([]error, len(m.KeyGroups)),
 	}
 	var parts [][]byte
@@ -679,13 +676,13 @@ func (m Metadata) GetDataKeyWithKeyServices(svcs []keyservice.KeyServiceClient, 
 	}
 	var dataKey []byte
 	if len(m.KeyGroups) > 1 {
-		if len(parts) < m.ShamirThreshold {
+		if len(parts) < m.BlakleyThreshold {
 			return nil, &getDataKeyErr
 		}
 		var err error
-		dataKey, err = shamir.Combine(parts)
+		dataKey, err = blakley.Combine(parts)
 		if err != nil {
-			return nil, fmt.Errorf("could not get data key from shamir parts: %s", err)
+			return nil, fmt.Errorf("could not get data key from blakley parts: %s", err)
 		}
 	} else {
 		if len(parts) != 1 {

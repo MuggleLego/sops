@@ -68,7 +68,7 @@ func metadataFromEncryptionConfig(config encryptConfig) sops.Metadata {
 		EncryptedRegex:    config.EncryptedRegex,
 		MACOnlyEncrypted:  config.MACOnlyEncrypted,
 		Version:           version.Version,
-		ShamirThreshold:   config.GroupThreshold,
+		BlakleyThreshold:  config.GroupThreshold,
 	}
 }
 

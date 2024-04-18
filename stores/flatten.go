@@ -243,18 +243,18 @@ func DecodeNonStrings(m map[string]interface{}) error {
 			m["mac_only_encrypted"] = true
 		}
 	}
-	if v, ok := m["shamir_threshold"]; ok {
+	if v, ok := m["blakley_threshold"]; ok {
 		switch val := v.(type) {
-			case string:
-				vInt, err := strconv.Atoi(val)
-				if err != nil {
-					return fmt.Errorf("shamir_threshold is not an integer: %s", err.Error())
-				}
-				m["shamir_threshold"] = vInt
-			case int:
-				m["shamir_threshold"] = val
-			default:
-				return fmt.Errorf("shamir_threshold is neither a string nor an integer, but %T", val)
+		case string:
+			vInt, err := strconv.Atoi(val)
+			if err != nil {
+				return fmt.Errorf("blakley_threshold is not an integer: %s", err.Error())
+			}
+			m["blakley_threshold"] = vInt
+		case int:
+			m["blakley_threshold"] = val
+		default:
+			return fmt.Errorf("blakley_threshold is neither a string nor an integer, but %T", val)
 		}
 	}
 	return nil
@@ -270,9 +270,9 @@ func EncodeNonStrings(m map[string]interface{}) {
 			}
 		}
 	}
-	if v, found := m["shamir_threshold"]; found {
+	if v, found := m["blakley_threshold"]; found {
 		if vInt, ok := v.(int); ok {
-			m["shamir_threshold"] = fmt.Sprintf("%d", vInt)
+			m["blakley_threshold"] = fmt.Sprintf("%d", vInt)
 		}
 	}
 }

@@ -57,7 +57,7 @@ func (err *getDataKeyError) UserError() string {
 			"has to be successful, but none were."
 	} else {
 		trailer = fmt.Sprintf("Recovery failed because the file was "+
-			"encrypted with a Shamir threshold of %d, but only %d part(s) "+
+			"encrypted with a Blakley threshold of %d, but only %d part(s) "+
 			"were successfully recovered, one for each successful key group. "+
 			"In order for SOPS to recover the file, at least %d groups have "+
 			"to be successful. In order for a group to be successful, "+

@@ -455,8 +455,8 @@ func main() {
 							Usage: "write output back to the same file instead of stdout",
 						},
 						cli.IntFlag{
-							Name:  "shamir-secret-sharing-threshold",
-							Usage: "the number of master keys required to retrieve the data key with shamir",
+							Name:  "blakley-secret-sharing-threshold",
+							Usage: "the number of master keys required to retrieve the data key with blakley",
 						},
 						cli.StringFlag{
 							Name:  "encryption-context",
@@ -515,7 +515,7 @@ func main() {
 							InputStore:     inputStore(c, c.String("file")),
 							OutputStore:    outputStore(c, c.String("file")),
 							Group:          group,
-							GroupThreshold: c.Int("shamir-secret-sharing-threshold"),
+							GroupThreshold: c.Int("blakley-secret-sharing-threshold"),
 							KeyServices:    keyservices(c),
 						})
 					},
@@ -533,8 +533,8 @@ func main() {
 							Usage: "write output back to the same file instead of stdout",
 						},
 						cli.IntFlag{
-							Name:  "shamir-secret-sharing-threshold",
-							Usage: "the number of master keys required to retrieve the data key with shamir",
+							Name:  "blakley-secret-sharing-threshold",
+							Usage: "the number of master keys required to retrieve the data key with blakley",
 						},
 					}, keyserviceFlags...),
 					ArgsUsage: `[index]`,
@@ -554,7 +554,7 @@ func main() {
 							InputStore:     inputStore(c, c.String("file")),
 							OutputStore:    outputStore(c, c.String("file")),
 							Group:          uint(group),
-							GroupThreshold: c.Int("shamir-secret-sharing-threshold"),
+							GroupThreshold: c.Int("blakley-secret-sharing-threshold"),
 							KeyServices:    keyservices(c),
 						})
 					},
@@ -593,7 +593,7 @@ func main() {
 				for _, path := range c.Args() {
 					err := updatekeys.UpdateKeys(updatekeys.Opts{
 						InputPath:   path,
-						GroupQuorum: c.Int("shamir-secret-sharing-quorum"),
+						GroupQuorum: c.Int("blakley-secret-sharing-quorum"),
 						KeyServices: keyservices(c),
 						Interactive: !c.Bool("yes"),
 						ConfigPath:  configPath,
@@ -817,8 +817,8 @@ func main() {
 					Usage: "comma separated list of KMS encryption context key:value pairs",
 				},
 				cli.IntFlag{
-					Name:  "shamir-secret-sharing-threshold",
-					Usage: "the number of master keys required to retrieve the data key with shamir",
+					Name:  "blakley-secret-sharing-threshold",
+					Usage: "the number of master keys required to retrieve the data key with blakley",
 				},
 				cli.StringFlag{
 					Name:  "filename-override",
@@ -1122,8 +1122,8 @@ func main() {
 					Usage: "comma separated list of KMS encryption context key:value pairs",
 				},
 				cli.IntFlag{
-					Name:  "shamir-secret-sharing-threshold",
-					Usage: "the number of master keys required to retrieve the data key with shamir",
+					Name:  "blakley-secret-sharing-threshold",
+					Usage: "the number of master keys required to retrieve the data key with blakley",
 				},
 				cli.BoolFlag{
 					Name:  "show-master-keys, s",
@@ -1225,8 +1225,8 @@ func main() {
 					Usage: "currently json, yaml, dotenv and binary are supported. If not set, sops will use the input file's extension to determine the output format",
 				},
 				cli.IntFlag{
-					Name:  "shamir-secret-sharing-threshold",
-					Usage: "the number of master keys required to retrieve the data key with shamir",
+					Name:  "blakley-secret-sharing-threshold",
+					Usage: "the number of master keys required to retrieve the data key with blakley",
 				},
 				cli.BoolFlag{
 					Name:  "ignore-mac",
@@ -1455,8 +1455,8 @@ func main() {
 			Usage: `set a specific key or branch in the input document. value must be a json encoded string. (edit mode only). eg. --set '["somekey"][0] {"somevalue":true}'`,
 		},
 		cli.IntFlag{
-			Name:  "shamir-secret-sharing-threshold",
-			Usage: "the number of master keys required to retrieve the data key with shamir",
+			Name:  "blakley-secret-sharing-threshold",
+			Usage: "the number of master keys required to retrieve the data key with blakley",
 		},
 		cli.IntFlag{
 			Name:  "indent",
@@ -1745,7 +1745,7 @@ func getEncryptConfig(c *cli.Context, fileName string) (encryptConfig, error) {
 	}
 
 	var threshold int
-	threshold, err = shamirThreshold(c, fileName)
+	threshold, err = blakleyThreshold(c, fileName)
 	if err != nil {
 		return encryptConfig{}, err
 	}
@@ -2024,18 +2024,18 @@ func loadConfig(c *cli.Context, file string, kmsEncryptionContext map[string]*st
 	return conf, nil
 }
 
-func shamirThreshold(c *cli.Context, file string) (int, error) {
-	if c.Int("shamir-secret-sharing-threshold") != 0 {
-		return c.Int("shamir-secret-sharing-threshold"), nil
+func blakleyThreshold(c *cli.Context, file string) (int, error) {
+	if c.Int("blakley-secret-sharing-threshold") != 0 {
+		return c.Int("blakley-secret-sharing-threshold"), nil
 	}
 	conf, err := loadConfig(c, file, nil)
 	if conf == nil {
 		// This takes care of the following two case:
-		// 1. No config was provided. Err will be nil and ShamirThreshold will be the default value of 0.
+		// 1. No config was provided. Err will be nil and BlakleyThreshold will be the default value of 0.
 		// 2. We did find a config file, but failed to load it. In that case the calling function will print the error and exit.
 		return 0, err
 	}
-	return conf.ShamirThreshold, nil
+	return conf.BlakleyThreshold, nil
 }
 
 func jsonValueToTreeInsertableValue(jsonValue string) (interface{}, error) {

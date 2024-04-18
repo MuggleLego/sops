@@ -656,7 +656,7 @@ b: ba"#
     }
 
     #[test]
-    fn roundtrip_shamir() {
+    fn roundtrip_blakley() {
         // The .sops.yaml file ensures this file is encrypted with two key groups, each with one GPG key
         let file_path = prepare_temp_file("test_roundtrip_keygroups.yaml", "a: secret".as_bytes());
         let output = Command::new(SOPS_BINARY_PATH)
@@ -667,7 +667,7 @@ b: ba"#
             .expect("Error running sops");
         assert!(
             output.status.success(),
-            "SOPS failed to encrypt a file with Shamir Secret Sharing"
+            "SOPS failed to encrypt a file with Blakley Secret Sharing"
         );
         let output = Command::new(SOPS_BINARY_PATH)
             .arg("decrypt")
@@ -676,13 +676,13 @@ b: ba"#
             .expect("Error running sops");
         assert!(
             output.status.success(),
-            "SOPS failed to decrypt a file with Shamir Secret Sharing"
+            "SOPS failed to decrypt a file with Blakley Secret Sharing"
         );
         assert!(String::from_utf8_lossy(&output.stdout).contains("secret"));
     }
 
     #[test]
-    fn roundtrip_shamir_missing_decryption_key() {
+    fn roundtrip_blakley_missing_decryption_key() {
         // The .sops.yaml file ensures this file is encrypted with two key groups, each with one GPG key,
         // but we don't have one of the private keys
         let file_path = prepare_temp_file(
@@ -697,7 +697,7 @@ b: ba"#
             .expect("Error running sops");
         assert!(
             output.status.success(),
-            "SOPS failed to encrypt a file with Shamir Secret Sharing"
+            "SOPS failed to encrypt a file with Blakley Secret Sharing"
         );
         let output = Command::new(SOPS_BINARY_PATH)
             .arg("decrypt")

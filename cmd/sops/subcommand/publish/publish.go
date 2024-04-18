@@ -109,7 +109,7 @@ func Run(opts Opts) error {
 				UnencryptedSuffix: conf.UnencryptedSuffix,
 				EncryptedSuffix:   conf.EncryptedSuffix,
 				Version:           version.Version,
-				ShamirThreshold:   conf.ShamirThreshold,
+				BlakleyThreshold:  conf.BlakleyThreshold,
 			}
 
 			dataKey, errs := tree.GenerateDataKeyWithKeyServices(opts.KeyServices)

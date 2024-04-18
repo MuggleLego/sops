@@ -33,7 +33,7 @@ func Add(opts AddOpts) error {
 	tree.Metadata.KeyGroups = append(tree.Metadata.KeyGroups, opts.Group)
 
 	if opts.GroupThreshold != 0 {
-		tree.Metadata.ShamirThreshold = opts.GroupThreshold
+		tree.Metadata.BlakleyThreshold = opts.GroupThreshold
 	}
 	tree.Metadata.UpdateMasterKeysWithKeyServices(dataKey, opts.KeyServices)
 	output, err := opts.OutputStore.EmitEncryptedFile(*tree)

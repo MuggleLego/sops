@@ -35,12 +35,12 @@ func Delete(opts DeleteOpts) error {
 	tree.Metadata.KeyGroups = append(tree.Metadata.KeyGroups[:opts.Group], tree.Metadata.KeyGroups[opts.Group+1:]...)
 
 	if opts.GroupThreshold != 0 {
-		tree.Metadata.ShamirThreshold = opts.GroupThreshold
+		tree.Metadata.BlakleyThreshold = opts.GroupThreshold
 	}
 
-	if len(tree.Metadata.KeyGroups) < tree.Metadata.ShamirThreshold {
-		return fmt.Errorf("removing this key group will make the Shamir threshold impossible to satisfy: "+
-			"Shamir threshold is %d, but we only have %d key groups", tree.Metadata.ShamirThreshold,
+	if len(tree.Metadata.KeyGroups) < tree.Metadata.BlakleyThreshold {
+		return fmt.Errorf("removing this key group will make the Blakley threshold impossible to satisfy: "+
+			"Blakley threshold is %d, but we only have %d key groups", tree.Metadata.BlakleyThreshold,
 			len(tree.Metadata.KeyGroups))
 	}
 

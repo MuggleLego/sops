@@ -166,7 +166,7 @@ func TestFlattenMetadataToUnflattenMetadata(t *testing.T) {
 	}{
 		{Metadata{MACOnlyEncrypted: true}},
 		{Metadata{MACOnlyEncrypted: false}},
-		{Metadata{ShamirThreshold: 3}},
+		{Metadata{BlakleyThreshold: 3}},
 		{Metadata{MessageAuthenticationCode: "line1\nline2"}},
 		{Metadata{MessageAuthenticationCode: "line1\n\n\nline2\n\nline3"}},
 	}
@@ -222,10 +222,10 @@ func TestDecodeNonStrings(t *testing.T) {
 		{map[string]interface{}{"mac_only_encrypted": "false"}, map[string]interface{}{"mac_only_encrypted": false}},
 		{map[string]interface{}{"mac_only_encrypted": "true"}, map[string]interface{}{"mac_only_encrypted": true}},
 		{map[string]interface{}{"mac_only_encrypted": "something-else"}, map[string]interface{}{"mac_only_encrypted": false}},
-		{map[string]interface{}{"shamir_threshold": "2"}, map[string]interface{}{"shamir_threshold": 2}},
-		{map[string]interface{}{"shamir_threshold": "002"}, map[string]interface{}{"shamir_threshold": 2}},
-		{map[string]interface{}{"shamir_threshold": "123"}, map[string]interface{}{"shamir_threshold": 123}},
-		{map[string]interface{}{"shamir_threshold": 123}, map[string]interface{}{"shamir_threshold": 123}},
+		{map[string]interface{}{"blakley_threshold": "2"}, map[string]interface{}{"blakley_threshold": 2}},
+		{map[string]interface{}{"blakley_threshold": "002"}, map[string]interface{}{"blakley_threshold": 2}},
+		{map[string]interface{}{"blakley_threshold": "123"}, map[string]interface{}{"blakley_threshold": 123}},
+		{map[string]interface{}{"blakley_threshold": 123}, map[string]interface{}{"blakley_threshold": 123}},
 	}
 
 	for _, tt := range tests {
@@ -240,8 +240,8 @@ func TestDecodeNonStringsErrors(t *testing.T) {
 		input map[string]interface{}
 		want  string
 	}{
-		{map[string]interface{}{"shamir_threshold": "foo"}, "shamir_threshold is not an integer: strconv.Atoi: parsing \"foo\": invalid syntax"},
-		{map[string]interface{}{"shamir_threshold": true}, "shamir_threshold is neither a string nor an integer, but bool"},
+		{map[string]interface{}{"blakley_threshold": "foo"}, "blakley_threshold is not an integer: strconv.Atoi: parsing \"foo\": invalid syntax"},
+		{map[string]interface{}{"blakley_threshold": true}, "blakley_threshold is neither a string nor an integer, but bool"},
 	}
 
 	for _, tt := range tests {
@@ -258,8 +258,8 @@ func TestEncodeNonStrings(t *testing.T) {
 	}{
 		{map[string]interface{}{"mac_only_encrypted": false}, map[string]interface{}{"mac_only_encrypted": "false"}},
 		{map[string]interface{}{"mac_only_encrypted": true}, map[string]interface{}{"mac_only_encrypted": "true"}},
-		{map[string]interface{}{"shamir_threshold": 2}, map[string]interface{}{"shamir_threshold": "2"}},
-		{map[string]interface{}{"shamir_threshold": 123}, map[string]interface{}{"shamir_threshold": "123"}},
+		{map[string]interface{}{"blakley_threshold": 2}, map[string]interface{}{"blakley_threshold": "2"}},
+		{map[string]interface{}{"blakley_threshold": 123}, map[string]interface{}{"blakley_threshold": "123"}},
 	}
 
 	for _, tt := range tests {

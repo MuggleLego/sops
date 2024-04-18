@@ -90,9 +90,9 @@ func updateFile(opts Opts) error {
 	}
 	tree.Metadata.KeyGroups = conf.KeyGroups
 	if opts.GroupQuorum != 0 {
-		tree.Metadata.ShamirThreshold = opts.GroupQuorum
+		tree.Metadata.BlakleyThreshold = opts.GroupQuorum
 	}
-	tree.Metadata.ShamirThreshold = min(tree.Metadata.ShamirThreshold, len(tree.Metadata.KeyGroups))
+	tree.Metadata.BlakleyThreshold = min(tree.Metadata.BlakleyThreshold, len(tree.Metadata.KeyGroups))
 	errs := tree.Metadata.UpdateMasterKeysWithKeyServices(key, opts.KeyServices)
 	if len(errs) > 0 {
 		return fmt.Errorf("error updating one or more master keys: %s", errs)

@@ -1,6 +1,8 @@
 module github.com/getsops/sops/v3
 
-go 1.19
+go 1.21.5
+
+toolchain go1.22.0
 
 require (
 	cloud.google.com/go/kms v1.15.7
@@ -55,6 +57,8 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.1 // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
+	github.com/MuggleLego/secret-sharing v0.0.0-20240402072421-4bc53e939c67 // indirect
+	github.com/MuggleLego/secret-sharing/blakley v0.0.0-20240418113243-4da1d4473c5f // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.15.0 // indirect
